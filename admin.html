@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin Panel - Booking Rental PS</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #1b2838;
+      color: #c7d5e0;
+      padding: 20px;
+      min-height: 100vh;
+    }
+    h1 {
+      color: #66c0f4;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #2a475e;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    th, td {
+      padding: 12px 15px;
+      border-bottom: 1px solid #3a5a7a;
+      text-align: left;
+    }
+    th {
+      background: #204060;
+      color: #a0cfff;
+    }
+    tr:hover {
+      background: #36648b;
+    }
+    img {
+      max-width: 80px;
+      border-radius: 6px;
+      box-shadow: 0 0 5px #00bfffaa;
+    }
+    button.delete-btn {
+      background: #ff4c4c;
+      border: none;
+      padding: 6px 12px;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background-color 0.3s ease;
+    }
+    button.delete-btn:hover {
+      background: #ff1a1a;
+    }
+  </style>
+</head>
+<body>
+  <h1>Admin Panel - Daftar Booking</h1>
+  <table id="booking-table">
+    <thead>
+      <tr>
+        <th>Nama</th>
+        <th>PS</th>
+        <th>Tanggal</th>
+        <th>Jam</th>
+        <th>Durasi (jam)</th>
+        <th>Total Bayar</th>
+        <th>Bukti Pembayaran</th>
+        <th>Aksi</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Data booking muncul di sini -->
+    </tbody>
+  </table>
+
+  <script>
+    async function fetchBookings() {
+      try {
+        const res = await fetch('https://2da4-114-122-135-252.ngrok-free.app/');
+        if (!res.ok) throw new Error('Gagal mengambil data');
+        const bookings = await res.json();
+        const tbody = document.querySelector('#booking-table tbody');
+        tbody.innerHTML = '';
+        bookings.forEach(b => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${b.nama}</td>
+            <td>${b.tipe}</td>
+            <td>${new Date(b.tanggal).toLocaleDateString()}</td>
+            <td>${b.jam}:00</td>
+            <td>${b.durasi}</td>
+            <td>Rp ${b.total.toLocaleString('id-ID')}</td>
+            <td><img src="${b.bukti}" alt="Bukti Bayar" /></td>
+            <td><button class="delete-btn" data-id="${b._id}">Hapus</button></td>
+          `;
+          tbody.appendChild(tr);
+        });
+
+        // Tambahkan event delete
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+          btn.onclick = async () => {
+            if (confirm('Hapus booking ini?')) {
+              const id = btn.getAttribute('data-id');
+              const res = await fetch(`https://2da4-114-122-135-252.ngrok-free.app/${id}`, { method: 'DELETE' });
+              if (res.ok) {
+                alert('Booking berhasil dihapus');
+                fetchBookings();
+              } else {
+                alert('Gagal menghapus booking');
+              }
+            }
+          };
+        });
+      } catch (err) {
+        alert(err.message);
+      }
+    }
+
+    fetchBookings();
+  </script>
+</body>
+</html>
