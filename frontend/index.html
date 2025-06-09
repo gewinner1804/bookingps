@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Booking Rental PS - Style Steam</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet" />
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: #1b2838;
+      color: #c7d5e0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .booking-card {
+      background: #2a475e;
+      max-width: 500px;
+      width: 100%;
+      padding: 32px 28px;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0, 191, 255, 0.2);
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    h1 {
+      font-weight: 700;
+      font-size: 1.6rem;
+      margin: 0 0 10px;
+      text-align: center;
+      color: #66c0f4;
+    }
+    label {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: #acdbf5;
+      margin-bottom: 6px;
+      display: block;
+    }
+    input, select {
+      width: 100%;
+      padding: 12px 16px;
+      font-size: 1rem;
+      border-radius: 8px;
+      border: 1px solid #66c0f4;
+      background-color: #1b2838;
+      color: #ffffff;
+      transition: border-color 0.3s ease;
+    }
+    input:focus, select:focus {
+      border-color: #00bfff;
+      outline: none;
+    }
+    input[type="file"] {
+      background-color: transparent;
+      color: #ffffff;
+    }
+    .note {
+      font-size: 0.85rem;
+      color: #a4b8cc;
+      margin-top: 2px;
+      text-align: center;
+    }
+    button {
+      background: #66c0f4;
+      border: none;
+      padding: 14px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: #1b2838;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background: #00bfff;
+    }
+    .contact {
+      text-align: center;
+      margin-top: 16px;
+      font-size: 0.9rem;
+      color: #66c0f4;
+    }
+    .contact a {
+      color: #00bfff;
+      text-decoration: none;
+    }
+    .contact a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="booking-card">
+    <h1>Booking Rental PS</h1>
+    <form id="booking-form">
+      <label for="nama">Nama Lengkap</label>
+      <input type="text" id="nama" name="nama" required />
+
+      <label for="tipe">Pilih Tipe PS</label>
+      <select id="tipe" name="tipe" required>
+        <option value="" disabled selected>-- Pilih PS --</option>
+        <option value="PS4">PS4 (Rp 10.000 / jam)</option>
+        <option value="PS5">PS5 (Rp 20.000 / jam)</option>
+      </select>
+
+      <label for="tanggal">Tanggal Main</label>
+      <input type="date" id="tanggal" name="tanggal" required />
+
+      <label for="jam">Jam Mulai</label>
+      <select id="jam" name="jam" required>
+        <!-- Diisi lewat JS -->
+      </select>
+
+      <label for="durasi">Durasi (jam)</label>
+      <input type="number" id="durasi" name="durasi" min="1" max="12" value="1" required />
+
+      <label for="bukti">Upload Bukti Transfer</label>
+      <input type="file" id="bukti" name="bukti" accept="image/*" required />
+      <div class="note">Transfer DANA ke: 087845332793</div>
+
+      <button type="submit">Pesan Sekarang</button>
+    </form>
+    <div class="contact">
+      Butuh bantuan? <a href="https://wa.me/62878745332793" target="_blank">Hubungi Admin</a>
+    </div>
+  </div>
+
+  <script>
+   const tanggalInput = document.getElementById('tanggal');
+const jamSelect = document.getElementById('jam');
+
+const today = new Date().toISOString().split('T')[0];
+tanggalInput.min = today;
+
+// --- hapus kode isi jam manual di sini ---
+
+function updateJamOptions() {
+  const selectedDate = tanggalInput.value;
+  const now = new Date();
+  const todayStr = now.toISOString().split('T')[0];
+
+  jamSelect.innerHTML = '';
+
+  let startHour = 9;
+  let endHour = 21;
+
+  if (selectedDate === todayStr) {
+    startHour = now.getHours() + 1;
+    if (startHour < 9) startHour = 9;
+    if (startHour > endHour) {
+      jamSelect.innerHTML = '<option value="">Tidak ada jam tersedia hari ini</option>';
+      return;
+    }
+  }
+
+  for (let h = startHour; h <= endHour; h++) {
+    const opt = document.createElement('option');
+    opt.value = h;
+    opt.textContent = `${h}:00`;
+    jamSelect.appendChild(opt);
+  }
+}
+
+tanggalInput.addEventListener('change', updateJamOptions);
+
+window.addEventListener('load', () => {
+  if (!tanggalInput.value) tanggalInput.value = today;
+  updateJamOptions();
+});
+
+
+    document.getElementById('booking-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const nama = document.getElementById('nama').value;
+      const tipe = document.getElementById('tipe').value;
+      const tanggal = document.getElementById('tanggal').value;
+      const jam = parseInt(document.getElementById('jam').value);
+      const durasi = parseInt(document.getElementById('durasi').value);
+      const bukti = document.getElementById('bukti').files[0];
+
+      const harga = tipe === 'PS4' ? 10000 : 20000;
+      const total = harga * durasi;
+
+      const toBase64 = file => new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = err => reject(err);
+      });
+
+      const buktiBase64 = await toBase64(bukti);
+
+      const data = {
+        nama,
+        tipe,
+        tanggal,
+        jam,
+        durasi,
+        total,
+        bukti: buktiBase64
+      };
+
+      try {
+        const res = await fetch('http://localhost:3000/booking', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(data)
+        });
+        const result = await res.json();
+        if (res.ok) {
+          alert(result.message);
+          document.getElementById('booking-form').reset();
+        } else {
+          alert(result.error);
+        }
+      } catch (err) {
+        alert('Gagal mengirim data: ' + err.message);
+      }
+    });
+  </script>
+</body>
+</html>

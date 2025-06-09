@@ -1,14 +1,14 @@
 {
-  "name": "booking-ps",
+  "name": "rental-ps-backend",
   "version": "1.0.0",
+  "description": "Backend untuk Booking Rental PS",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
-    "body-parser": "^1.20.2",
     "cors": "^2.8.5",
     "express": "^4.18.2",
-    "mongodb": "^5.8.1"
+    "mongoose": "^7.6.1"
   }
 }
